@@ -32,7 +32,6 @@ def questions_list(request):
 
 # getting , updating & deleting a single instance
 @csrf_exempt
-
 def question_detail(request, id):
 
     try:
