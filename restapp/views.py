@@ -9,6 +9,8 @@ from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import generics
+from rest_framework import mixins
 
 
 # Create your views here.
@@ -80,6 +82,9 @@ from rest_framework.response import Response
 class QuestionAPIView(APIView):
 
     """
+    API View is the wrapper that make sure this view receives request,
+    context is passed to the response object which will help in content type negotiation
+
     list all the questions objects, or create a new one
     """
 
@@ -115,7 +120,7 @@ class QuestionDetailAPIView(APIView):
         serializer = QuestionSerializer(question)
         return Response(serializer.data)
 
-    # UPDATE
+    # UPDATE/PUT
     def put(self, request, pk):
         question = self.get_object(pk)
         serializer = QuestionSerializer(question, request.data)
@@ -131,3 +136,17 @@ class QuestionDetailAPIView(APIView):
         question.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+# Using Generic API View & Mixins
+# generic class provides the core functionality
+# mixins provides the .list() & .create() actions, get & post method we explicitly bind these actions to it
+
+class QuestionListGenericAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin):
+    question_queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request)
+
+    def post(self, request):
+        return self.create(request)

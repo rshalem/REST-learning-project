@@ -13,7 +13,7 @@ class QuestionSerializer(serializers.Serializer):
     address = serializers.CharField(style={'base_template': 'textarea.html'})
 
     def create(self, validated_data):
-        queryset = Question.objects.create(validated_data)
+        queryset = Question.objects.create(**validated_data)
         return queryset
 
     def update(self, instance, validated_data):
