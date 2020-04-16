@@ -1,6 +1,7 @@
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404
+from django.contrib.auth.models import User
 from .models import Question
 from .serializers import QuestionSerializer
 
@@ -95,9 +96,17 @@ class QuestionAPIView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
+
+        #temporary
+        account = User.objects.get(pk=1)
+        # assigning question object with user ie account instance, as it is not defined inside Serializer class
+        # and to create a new question object User field is required
+        # kinda ORM from shell for creating a new user instance
+        question = Question(user=account)
+
         # user entering data, that request is passed
         data = request.data
-        serializer = QuestionSerializer(data=data)
+        serializer = QuestionSerializer(question, data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -141,12 +150,38 @@ class QuestionDetailAPIView(APIView):
 # generic class provides the core functionality
 # mixins provides the .list() & .create() actions, get & post method we explicitly bind these actions to it
 
-class QuestionListGenericAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin):
-    question_queryset = Question.objects.all()
-    serializer_class = QuestionSerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.list(request)
-
-    def post(self, request):
-        return self.create(request)
+# class QuestionListGenericAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin):
+#     queryset = Question.objects.all()
+#     serializer_class = QuestionSerializer
+#
+#     def get(self, request, *args, **kwargs):
+#         return self.list(request)
+#
+#     def post(self, request):
+#         return self.create(request)
+#
+#     # this fnc overrides the serializer.save(), thus by allowing the logged in user to be able to Create new instance
+#     # takes in user as an argument
+#     #def perform_create(self, serializer):
+#         #serializer.save(user=self.request.user)
+#
+#
+# class QuestionDetailGenericView(generics.GenericAPIView,
+#                                 mixins.RetrieveModelMixin,
+#                                 mixins.UpdateModelMixin,
+#                                 mixins.DestroyModelMixin):
+#
+#     queryset = Question.objects.all()
+#     serializer_class = QuestionSerializer
+#     lookup_field = 'id'
+#
+#     def get(self, request):
+#         return self.retrieve(request)
+#
+#     def put(self, request):
+#         return self.update(request)
+#
+#     def delete(self, request):
+#         return self.delete(request)
+#
+#

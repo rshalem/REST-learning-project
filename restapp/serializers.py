@@ -22,5 +22,5 @@ class QuestionSerializer(serializers.Serializer):
         instance.language = validated_data.get('language', instance.language)
         instance.address = validated_data.get('address', instance.address)
         instance.save()
-
         return instance
+

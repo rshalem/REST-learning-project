@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
-from . import views
+from restapp import views
 
 app_name = 'restapp'
 
@@ -9,6 +9,7 @@ urlpatterns = [
     #path('questions/<int:id>/', views.question_detail, name='question-detail'),
     path('questions/', views.QuestionAPIView.as_view(), name='question-list'),
     path('questions/<int:pk>/', views.QuestionDetailAPIView.as_view(), name='question-detail'),
+    path('questions/create', views.QuestionAPIView.as_view(), name='question-create'),
 
 ]
 
